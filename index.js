@@ -125,8 +125,9 @@ function addDepartment() {
         })
         viewDepartments();
         })
-        connection.end();
+        
 }
+
 
 function addRole() {
     connection.query('SELECT * FROM department', function(err, res) {
@@ -182,7 +183,7 @@ function addRole() {
                 // })
                 console.log(`You have added this role: ${(values[0])}.`)
             })
-            connection.end();
+            viewRoles();
             })
         })
     })
@@ -247,7 +248,6 @@ function addEmployee() {
                        
             })
         })
-            // connection.end();
     })
        
    
@@ -276,43 +276,42 @@ function updateRole() {
           ]) 
 // in order to get the id here, i need a way to grab it from the departments table 
         .then(function(answer) {
-        console.log(answer);
-        const name = answer.employeeName;
-    
-        connection.query("SELECT * FROM role", function(err, res) {
-                inquirer
-                .prompt ([
-                    {
-                        name: "role",
-                        type: "list",
-                        message: "What is their new role?",
-                        choices: function() {
-                            rolesArray = [];
-                            res.forEach(res => {
-                                rolesArray.push(res.title)
-                            })
-                            return rolesArray;
+            console.log(answer);
+            const name = answer.employeeName;
+        
+            connection.query("SELECT * FROM role", function(err, res) {
+                    inquirer
+                    .prompt ([
+                        {
+                            name: "role",
+                            type: "list",
+                            message: "What is their new role?",
+                            choices: function() {
+                                rolesArray = [];
+                                res.forEach(res => {
+                                    rolesArray.push(res.title)
+                                })
+                                return rolesArray;
+                            }
                         }
-                    }
-                ]).then(function(rolesAnswer) {
-                    const role = rolesAnswer.role;
-                    console.log(rolesAnswer.role);
-                connection.query('SELECT * FROM role WHERE title = ?', [role], function(err, res) {
-                if (err) throw (err);
-                    let roleId = res[0].id;
-                    let query = "UPDATE employee SET role_id ? WHERE last_name ?";
-                    let values = [roleId, name]
-                    console.log(values);
-                     connection.query(query, values,
-                         function(err, res, fields) {
-                         console.log(`You have updated ${name}'s role to ${role}.`)
+                    ]).then(function(rolesAnswer) {
+                        const role = rolesAnswer.role;
+                        console.log(rolesAnswer.role);
+                        connection.query('SELECT * FROM role WHERE title = ?', [role], function(err, res) {
+                            if (err) throw (err);
+                                let roleId = res[0].id;
+                                let query = "UPDATE employee SET role_id ? WHERE last_name ?";
+                                let values = [roleId, name]
+                                console.log(values);
+                                connection.query(query, values,
+                                    function(err, res, fields) {
+                                        console.log(`You have updated ${name}'s role to ${role}.`)
+                                    });
+                            viewEmployees();
                         });
-                        viewEmployees();
-                        });
-                     });
+                    });
                 });
        });
-       connection.end();
 });
 
 };
